@@ -7,3 +7,11 @@ exports.generateUserObject = function(data) {
         gender: data.gender
     }
 }
+
+exports.generateTokenObject = function(data, token) {
+    return {
+        email: data.email,
+        token: token,
+        created_at: new Date()
+    }
+}

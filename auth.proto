@@ -8,7 +8,7 @@ service Auth{
 }
 
 message logoutParams{
-    string email = 1;
+    string token = 1;
 }
 
 message loginParams{

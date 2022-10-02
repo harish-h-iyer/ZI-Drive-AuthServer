@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const userModel = require("../../models/TokenModel");
+const tokenModel = require("../../models/TokenModel");
 const commonUtils = require("../../utils/CommonUtils");
 const tokenDto = require("../DataTransfer/TokenDto");
 const userClient = require("../../userClient");
@@ -16,12 +16,11 @@ module.exports = class API {
         var data = call.request;
         if (!commonUtils.checkEmptyFieldValue(data.email) || !commonUtils.checkEmptyFieldValue(data.password)){
             console.log("Incomplete Data Recieved While Creating User.");
-            callback(null, response);
+            var messageObj = {
+                message: "Incomplete Data Recieved While Creating User."
+            }
+            callback(null, messageObj);
         }else{
-
-            var query = {
-                email: data.email
-            };
 
             userClient.getUserDetails(data.email, function(response){
                 console.log("Hi", response);
@@ -39,7 +38,19 @@ module.exports = class API {
                             var tokenObj = {
                                 message: token
                             }
-                            callback(null, tokenObj);
+                            var tokenObject = new tokenModel(tokenDto.generateTokenObject(response, token));
+
+                            tokenObject.save(tokenObject, function(error, result){
+                                if(error){
+                                    var message = {
+                                        message: error
+                                    }
+
+                                    callback(null, message);
+                                }else{
+                                    callback(null, tokenObj);
+                                }
+                            });
                         }else{
                             var errorRes = {
                                 message: "Invalid Usename/Password"
@@ -50,36 +61,24 @@ module.exports = class API {
                 })
 
             });
-
-            // userModel.findOne(query, function(error, foundUser){
-            //     if(error){
-            //         callback(null, error);
-            //     }else{
-            //         console.log(foundUser);
-            //         if(foundUser){
-            //         }else {
-            //             return callback({
-            //                 code: this.grpc.status.UNAUTHENTICATED,
-            //                 message: "No user found",
-            //             });
-            //         }
-            //     }
-            // })
         }
     }
 
-    readUser = (call, callback) => {
-        var data = call.request;
+    logout = (call, callback) => {
+        var data = call.request.token;
         console.log(data);
         var query = {
-            email: data.email
+            token: data
         };
-        userModel.findOne(query, function(error, foundUser){
+        tokenModel.findOneAndDelete(query, function(error, foundToken){
             if(error){
                 callback(null, error);
             }else{
-                console.log(foundUser);
-                callback(null, foundUser);
+                console.log(foundToken);
+                var messageObj = {
+                    message: "User Logged out successfully"
+                }
+                callback(null, messageObj);
             }
         })
     }
