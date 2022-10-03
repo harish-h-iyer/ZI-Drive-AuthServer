@@ -82,4 +82,23 @@ module.exports = class API {
             }
         })
     }
+
+    getToken = (call, callback) => {
+        var data = call.request.token;
+        console.log(data);
+        var query = {
+            token: data
+        };
+        tokenModel.findOne(query, function(error, foundToken){
+            if(error){
+                callback(null, error);
+            }else{
+                console.log(foundToken);
+                var messageObj = {
+                    message: foundToken
+                }
+                callback(null, messageObj);
+            }
+        })
+    }
 };

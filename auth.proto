@@ -5,6 +5,7 @@ package authPackage;
 service Auth{
     rpc login(loginParams) returns (message);  
     rpc logout(logoutParams) returns (message);
+    rpc getToken(logoutParams) returns (message);
 }
 
 message logoutParams{

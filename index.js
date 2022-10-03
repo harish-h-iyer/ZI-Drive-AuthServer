@@ -31,7 +31,8 @@ async function main() {
 
     server.addService(authPackage.Auth.service, {
         "login": api.login,
-        "logout": api.logout
+        "logout": api.logout,
+        "getToken": api.getToken
     });
     
     let address = process.env.HOST + ":" + process.env.PORT;
